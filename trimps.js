@@ -1,4 +1,4 @@
-/* ------------------------------------------------------------------------ */
+ /* ------------------------------------------------------------------------ */
 // Clone objects
 /* ------------------------------------------------------------------------ */
 function clone(obj) {
@@ -199,7 +199,7 @@ var buildings = {'food': 'Barn',
 		for(upg in game.resources) {
 			if (game.resources.hasOwnProperty(upg)) {
 				if(buildings[upg]) {
-		        	if (upg.owned >= (getMax(game.resources[upg]) * 0.99) && canAffordBuilding(buildings[upg], false)) {
+		        	if (game.resources[upg].owned >= (getMax(game.resources[upg]) * 0.99) && canAffordBuilding(buildings[upg], false)) {
 		            	buyBuilding(buildings[upg]);
 						if(echoWarehouse.logic) {
 							console.log('Purchased ' + buildings[upg]);
