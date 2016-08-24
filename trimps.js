@@ -336,7 +336,7 @@ insertBot({text: 'Well Fed', divId: 'runWellFed', buttonId: 'runWellFedBtn', res
 /* ------------------------------------------------------------------------ */
 var maxResource = function (res) {
 	var max = getMax(game.resources[res]);
-	if(max != -1 ? (overFlow ? (game.resources[res].owned * 2 < max ? true : false) : true) : true) {
+	if(max >= 0 ? (overFlow ? (game.resources[res].owned * 2 < max ? true : false) : true) : true) {
 		game.resources[res].owned *= 2;
 		console.log(`Increased ${res} by ${game.resources[res].owned}`);
 	} 
