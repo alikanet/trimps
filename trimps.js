@@ -48,7 +48,7 @@ var constWorker = function() {
 
 	if(runFreeWorkers) {
 		var trimps = game.resources.trimps;
-		var jobs = ['Dragimp', 'Geneticist', 'Miner', 'Farmer', 'Lumberjack', 'Trainer', 'Explorer', 'Miner', 'Farmer', 'Lumberjack', 'Scientist'];
+		var jobs = ['Trainer', 'Explorer', 'Dragimp', 'Geneticist', 'Miner', 'Farmer', 'Lumberjack', 'Scientist'];
 
 		var free = (Math.ceil(trimps.realMax() / 2) - trimps.employed);
 
@@ -79,8 +79,48 @@ var constWorker = function() {
 constWorker();
 
 /* ------------------------------------------------------------------------ */
+// Auto check for equipment to purchase
+/* ------------------------------------------------------------------------ */
+var runEquipment = false;
+var endEquipment = false;
+var echoEquipment = clone(echo);
+var constEquipment = function() {
+
+var equipment = ['Shield', 'Arbalest', 'Breastplate', 'Greatsword', 'Shoulderguards', 'Battleaxe', 'Pants', 'Polearm', 'Helmet', 'Mace', 'Boots', 'Dagger', 'Gambeson'];
+	
+	if (runEquipment) {
+		var oldBuyAmt = game.global.buyAmt;
+		game.global.buyAmt = 1;
+		
+		for (var i = 0; i < equipment.length; i++) {
+			if (!game.equipment[equipment[i]].locked && game.equipment[equipment[i]].level < 10) {
+				if (canAffordBuilding(equipment[i], true, null, true)) {
+					buyEquipment(equipment[i]);
+					if (echoEquipment.logic) {
+						console.log('Purchased ' + equipment[i]);
+					}
+				}
+			}
+		}
+		game.global.buyAmt = oldBuyAmt;
+	}	
+
+	if(!endEquipment || !endAll) {
+		if(echoEquipment.loop) {
+			console.log('Running Free Worker');
+		}
+    	setTimeout(function() {
+        	constEquipment();
+    	}, 1000);		
+	}
+}
+
+constEquipment();
+
+/* ------------------------------------------------------------------------ */
 // Auto check for Well Fed
 /* ------------------------------------------------------------------------ */
+var wellFedOption = 'metal';
 var runWellFed = false;
 var endWellFed = false;
 var echoWellFed = clone(echo);
@@ -89,7 +129,7 @@ var constwf = function () {
 	if(runWellFed) {
 		if(game.global.turkimpTimer > 0) {
 			if(echoWellFed.logic) {
-				setGather('metal', false);
+				setGather(wellFedOption, false);
 			}
 		}
 	}
@@ -117,6 +157,7 @@ var construir = function () {
 
 	var buildings = ['Warpstation', 'Collector', 'Wormhole', 'Gateway', 'Resort', 'Hotel', 'Mansion', 'House', 'Hut'];
 	var level = false;
+	var count = 3;
 
 	if(runBuilding) {
 	    for (var i = 0;i < buildings.length;i++) {
@@ -128,7 +169,7 @@ var construir = function () {
 						console.log('Purchased ' + buildings[i]);
 					}
 		        }
-				if(!level) {
+				if(!level || count == 0) {
 					break;
 				}
 			}
@@ -159,8 +200,6 @@ var constupg = function () {
 		for(upg in game.upgrades) {
 			if (game.upgrades.hasOwnProperty(upg)) {
 	        	if (!game.upgrades[upg].locked && !game.upgrades[upg].prestiges && canAffordTwoLevel(upg, false)) {
-
-					console.log(game.upgrades[upg]);
 					if(game.upgrades[upg] == 'Coordination' ? canAffordCoordinationTrimps() ? true : false : true) {
 		            	buyUpgrade(upg);
 						if(echoUpgrade.logic) {
@@ -308,7 +347,7 @@ var toggleBot = function (bot) {
 // Create HTML Buttons to toggle Bots
 /* ------------------------------------------------------------------------ */
 var insertBot = function (collection) {
-	var collectBtn = document.getElementById("battleBtnsColumn");
+	var collectBtn = document.getElementById("battleBtnsColumn");// "extraMapBtns";
 	var btnText = collectBtn.innerHTML;
 	var btnColor = this[collection.res] ? 'btn-success' : 'btn-danger';
 
@@ -330,6 +369,7 @@ insertBot({text: 'Breeding', divId: 'runBreed', buttonId: 'runBreedBtn', res: 'r
 insertBot({text: 'Warehouse', divId: 'runWarehouse', buttonId: 'runWarehouseBtn', res: 'runWarehouse'});
 insertBot({text: 'Maps', divId: 'runMaps', buttonId: 'runMapsBtn', res: 'runMaps'});
 insertBot({text: 'Well Fed', divId: 'runWellFed', buttonId: 'runWellFedBtn', res: 'runWellFed'});
+insertBot({text: 'Equipment', divId: 'runEquipment', buttonId: 'runEquipmentBtn', res: 'runEquipment'});
 
 /* ------------------------------------------------------------------------ */
 // Set owned value to max Resources without overflow
@@ -363,7 +403,8 @@ insertMaxResource('gems');
 insertMaxResource('fragments');
 insertMaxResource('helium');
 
-/* ------------------------------------------------------------------------ */
+
+// /* ------------------------------------------------------------------------ */
 // Create HTML for Buttons in Settings Section
 /* ------------------------------------------------------------------------ */
 var insertSettings = function (collection) {
