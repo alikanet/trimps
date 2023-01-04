@@ -387,9 +387,7 @@ var maxResource = function (res) {
 /* ------------------------------------------------------------------------ */
 var insertMaxResource = function (res) {
 	var collectBtn = document.getElementById(res);
-	console.log(collectBtn);
 	var txtStr = collectBtn.innerHTML;
-	console.log(txtStr);
 	var txtReplace = `<span onclick="maxResource('${res}')" `;
 
 	collectBtn.innerHTML = txtStr.replace('<span ', txtReplace);
